@@ -51,7 +51,7 @@ public:
     bit_packed_atomic_flags() = delete;
 
     /**
-     * bit_packed_atomic_flags constructor creates memory to sufficiently
+     * bit_packed_atomic_flags constructor creates enough memory to sufficiently
      * keep track of garbage collection information for `size` entries.
      *
      * @param size the number of elements to allocate space for
@@ -155,7 +155,7 @@ public:
  *
  * @tparam Element should be a movable and copyable type
  * @tparam Hash should be a function/callable which takes a template parameter
- * hash_select and an Element and extracts a hash from it. Should return
+ * hash_select and an Element, and then extracts a hash from it. Should return
  * high-entropy uint32_t hashes for `Hash h; h<0>(e) ... h<7>(e)`.
  */
 template <typename Element, typename Hash>

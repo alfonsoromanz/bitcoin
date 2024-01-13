@@ -32,15 +32,15 @@ static constexpr int32_t DEFAULT_ADDRMAN_CONSISTENCY_CHECKS{0};
 
 /** Location information for an address in AddrMan */
 struct AddressPosition {
-    // Whether the address is in the new or tried table
+    // Whether the address is in the "new" or "tried" table
     const bool tried;
 
-    // Addresses in the tried table should always have a multiplicity of 1.
-    // Addresses in the new table can have multiplicity between 1 and
+    // Addresses in the "tried" table should always have a multiplicity of 1.
+    // Addresses in the "new" table can have multiplicity between 1 and
     // ADDRMAN_NEW_BUCKETS_PER_ADDRESS
     const int multiplicity;
 
-    // If the address is in the new table, the bucket and position are
+    // If the address is in the "new" table, the bucket and position are
     // populated based on the first source who sent the address.
     // In certain edge cases, this may not be where the address is currently
     // located.
@@ -110,7 +110,7 @@ public:
     size_t Size(std::optional<Network> net = std::nullopt, std::optional<bool> in_new = std::nullopt) const;
 
     /**
-     * Attempt to add one or more addresses to addrman's new table.
+     * Attempt to add one or more addresses to addrman's "new" table.
      *
      * @param[in] vAddr           Address records to attempt to add.
      * @param[in] source          The address of the node that sent us these addr records.
@@ -121,22 +121,22 @@ public:
     bool Add(const std::vector<CAddress>& vAddr, const CNetAddr& source, std::chrono::seconds time_penalty = 0s);
 
     /**
-     * Mark an address record as accessible and attempt to move it to addrman's tried table.
+     * Mark an address record as accessible and attempt to move it to addrman's "tried" table.
      *
-     * @param[in] addr            Address record to attempt to move to tried table.
+     * @param[in] addr            Address record to attempt to move to "tried" table.
      * @param[in] time            The time that we were last connected to this peer.
-     * @return    true if the address is successfully moved from the new table to the tried table.
+     * @return    true if the address is successfully moved from the "new" table to the "tried" table.
      */
     bool Good(const CService& addr, NodeSeconds time = Now<NodeSeconds>());
 
     //! Mark an entry as connection attempted to.
     void Attempt(const CService& addr, bool fCountFailure, NodeSeconds time = Now<NodeSeconds>());
 
-    //! See if any to-be-evicted tried table entries have been tested and if so resolve the collisions.
+    //! See if any to-be-evicted "tried" table entries have been tested and if so resolve the collisions.
     void ResolveCollisions();
 
     /**
-     * Randomly select an address in the tried table that another address is
+     * Randomly select an address in the "tried" table that another address is
      * attempting to evict.
      *
      * @return CAddress The record for the selected tried peer.
@@ -147,9 +147,9 @@ public:
     /**
      * Choose an address to connect to.
      *
-     * @param[in] new_only Whether to only select addresses from the new table. Passing `true` returns
-     *                     an address from the new table or an empty pair. Passing `false` will return an
-     *                     empty pair or an address from either the new or tried table (it does not
+     * @param[in] new_only Whether to only select addresses from the "new" table. Passing `true` returns
+     *                     an address from the "new" table or an empty pair. Passing `false` will return an
+     *                     empty pair or an address from either the "new" or "tried" table (it does not
      *                     guarantee a tried entry).
      * @param[in] network  Select only addresses of this network (nullopt = all). Passing a network may
      *                     slow down the search.
@@ -172,8 +172,8 @@ public:
 
     /**
      * Returns an information-location pair for all addresses in the selected addrman table.
-     * If an address appears multiple times in the new table, an information-location pair
-     * is returned for each occurrence. Addresses only ever appear once in the tried table.
+     * If an address appears multiple times in the "new" table, an information-location pair
+     * is returned for each occurrence. Addresses only ever appear once in the "tried" table.
      *
      * @param[in] from_tried     Selects which table to return entries from.
      *

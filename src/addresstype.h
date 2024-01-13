@@ -138,7 +138,7 @@ bool IsValidDestination(const CTxDestination& dest);
  *
  * For standard scripts that have addresses (and P2PK as an exception), a corresponding CTxDestination
  * is assigned to addressRet.
- * For all other scripts. addressRet is assigned as a CNoDestination containing the scriptPubKey.
+ * For all other scripts, addressRet is assigned as a CNoDestination containing the scriptPubKey.
  *
  * Returns true for standard destinations with addresses - P2PKH, P2SH, P2WPKH, P2WSH, P2TR and P2W??? scripts.
  * Returns false for non-standard destinations and those without addresses - P2PK, bare multisig, null data, and nonstandard scripts.

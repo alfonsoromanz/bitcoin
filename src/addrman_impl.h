@@ -76,13 +76,13 @@ public:
     {
     }
 
-    //! Calculate in which "tried" bucket this entry belongs
+    //! Calculate to which "tried" bucket this entry belongs
     int GetTriedBucket(const uint256& nKey, const NetGroupManager& netgroupman) const;
 
-    //! Calculate in which "new" bucket this entry belongs, given a certain source
+    //! Calculate to which "new" bucket this entry belongs, given a certain source
     int GetNewBucket(const uint256& nKey, const CNetAddr& src, const NetGroupManager& netgroupman) const;
 
-    //! Calculate in which "new" bucket this entry belongs, using its default source
+    //! Calculate to which "new" bucket this entry belongs, using its default source
     int GetNewBucket(const uint256& nKey, const NetGroupManager& netgroupman) const
     {
         return GetNewBucket(nKey, source, netgroupman);
@@ -234,7 +234,7 @@ private:
     //! Swap two elements in vRandom.
     void SwapRandom(unsigned int nRandomPos1, unsigned int nRandomPos2) const EXCLUSIVE_LOCKS_REQUIRED(cs);
 
-    //! Delete an entry. It must not be in tried, and have refcount 0.
+    //! Delete an entry. It must not be in "tried", and must have a refcount of 0.
     void Delete(int nId) EXCLUSIVE_LOCKS_REQUIRED(cs);
 
     //! Clear a position in a "new" table. This is the only place where entries are actually deleted.
@@ -257,7 +257,7 @@ private:
 
     /** Helper to generalize looking up an addrman entry from either table.
      *
-     *  @return  int The nid of the entry. If the addrman position is empty or not found, returns -1.
+     *  @return  int The nid of the entry. Returns -1 If the addrman position is empty or not found.
      * */
     int GetEntry(bool use_tried, size_t bucket, size_t position) const EXCLUSIVE_LOCKS_REQUIRED(cs);
 
