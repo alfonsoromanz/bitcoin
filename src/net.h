@@ -295,9 +295,9 @@ public:
 
     /** Set the next message to send.
      *
-     * If no message can currently be set (perhaps because the previous one is not yet done being
-     * sent), returns false, and msg will be unmodified. Otherwise msg is enqueued (and
-     * possibly moved-from) and true is returned.
+     * Returns false and leaves msg unmodified if no message can currently be set (perhaps
+     * because the previous one is not yet done being sent). Otherwise returns true and msg is enqueued (and
+     * possibly moved-from)
      */
     virtual bool SetMessageToSend(CSerializedNetMsg& msg) noexcept = 0;
 

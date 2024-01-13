@@ -25,7 +25,7 @@ enum class NetPermissionFlags : uint32_t {
     // Always relay transactions from this peer, even if already in mempool
     // Keep parameter interaction: forcerelay implies relay
     ForceRelay = (1U << 2) | Relay,
-    // Allow getheaders during IBD and block-download after maxuploadtarget limit
+    // Allow getheaders during IBD and block-download after -maxuploadtarget limit
     Download = (1U << 6),
     // Can't be banned/disconnected/discouraged for misbehavior
     NoBan = (1U << 4) | Download,

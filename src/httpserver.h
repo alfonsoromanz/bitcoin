@@ -108,7 +108,7 @@ public:
     /**
      * Read request body.
      *
-     * @note As this consumes the underlying buffer, call this only once.
+     * @note Call this function only once, as this consumes the underlying buffer.
      * Repeated calls will return an empty string.
      */
     std::string ReadBody();

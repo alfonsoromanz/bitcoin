@@ -276,7 +276,7 @@ private:
     }
 
     /** epoch_check handles the changing of epochs for elements stored in the
-     * cache. epoch_check should be run before every insert.
+     * cache. epoch_check should be called before every insert.
      *
      * First, epoch_check decrements and checks the cheap heuristic, and then does
      * a more expensive scan if the cheap heuristic runs out. If the expensive
