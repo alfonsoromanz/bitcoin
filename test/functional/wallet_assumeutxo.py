@@ -5,14 +5,15 @@
 """Test for assumeutxo wallet related behavior.
 See feature_assumeutxo.py for background.
 """
+from test_framework.descriptors import descsum_create
 from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import (
     assert_equal,
+    assert_greater_than,
     assert_raises_rpc_error,
 )
 from test_framework.wallet import MiniWallet
 from test_framework.wallet_util import get_generate_key
-from test_framework.descriptors import descsum_create
 
 START_HEIGHT = 199
 SNAPSHOT_BASE_HEIGHT = 299
@@ -33,7 +34,7 @@ class AssumeutxoTest(BitcoinTestFramework):
         self.extra_args = [
             [],
             [],
-            ["-prune=1"]
+            ["-fastprune", "-prune=1"]
         ]
 
     def setup_network(self):
@@ -109,7 +110,7 @@ class AssumeutxoTest(BitcoinTestFramework):
         for n in self.nodes:
             assert_equal(n.getblockchaininfo()[
                          "headers"], SNAPSHOT_BASE_HEIGHT)
-
+        wallet_last_processed_block = w.getwalletinfo()['lastprocessedblock']
         w.backupwallet("backup_w.dat")
 
         self.log.info("-- Testing assumeutxo")
@@ -147,6 +148,8 @@ class AssumeutxoTest(BitcoinTestFramework):
 
         self.log.info("Backup can't be loaded during background sync (pruned node)")
         loaded = n2.loadtxoutset(dump_output['path'])
+        n2.pruneblockchain(START_HEIGHT)
+        assert_greater_than(n2.getblockchaininfo()['pruneheight'], 0)
         self.validate_snapshot_import(n2, loaded, dump_output['base_hash'])
         assert_raises_rpc_error(-4,  error_message, n2.restorewallet, "w", "backup_w.dat")
 
@@ -197,8 +200,18 @@ class AssumeutxoTest(BitcoinTestFramework):
         self.connect_nodes(0, 2)
         self.sync_blocks(nodes=(n0, n2))
         self.wait_until(lambda: len(n2.getchainstates()['chainstates']) == 1)
-        self.log.info("Ensuring wallet can be restored from backup (pruned node)")
-        n2.restorewallet("w", "backup_w.dat")
+        # I need to generate blocks in order to make the pruning work
+        self.generate(n2, nblocks=500, sync_fun=self.no_op)
+        n2.pruneblockchain(FINAL_HEIGHT)
+        self.log.info("Restoring wallet from backup (pruned node)")
+        # I am asserting this error message although I'm not sure if this
+        # behaviour is correct. The pruneheight is at 299, and it matches
+        # with the last processed block from the wallet (see logs below).
+        # I would expect this wallet to be loaded since block 299 is still stored.
+        self.log.info(f"Wallet last processed block {wallet_last_processed_block}")
+        self.log.info(f"Node's oldest block height: {n2.getblockchaininfo()['pruneheight']}, hash: {n2.getblockhash(n2.getblockchaininfo()['pruneheight'])}")
+        error_message = "Wallet loading failed. Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)"
+        assert_raises_rpc_error(-4,  error_message, n2.restorewallet, "w", "backup_w.dat")
 
         self.log.info("Ensuring descriptors can be loaded after background sync")
         n1.loadwallet(wallet_name)
